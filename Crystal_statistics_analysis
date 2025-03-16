@@ -1,0 +1,453 @@
+# Main script
+
+close all; clear all; clc;
+%area_1
+epi_1 = readmatrix("Epi_20250310.xlsx");
+mus_1 = readmatrix("mus_20250310.xlsx");
+titan_1 = readmatrix("titan_20250310.xlsx");
+% %area_2
+% epi_2 = readmatrix("Epi_stithed_2.xlsx");
+% mus_2 = readmatrix("mus_stithed_2.xlsx");
+% titan_2 = readmatrix("titan_stithed_2.xlsx");
+% %area_3
+% epi_3 = readmatrix("Epi_stithed_3.xlsx");
+% mus_3 = readmatrix("mus_stithed_3.xlsx");
+% titan_3 = readmatrix("titan_stithed_3.xlsx");
+
+% Area 1
+epi_area_1 = epi_1(:,4);
+epi_perimeter_1 = epi_1(:,5);
+epi_longax_1 = epi_1(:,6);
+epi_shortax_1 = epi_1(:,7);
+epi_angle_1 = epi_1(:,8);
+epi_ar_fiji_1 = epi_1(:,9);
+epi_cir_1 = epi_1(:,10);
+mean_epilong_1 = mean(epi_longax_1);
+
+mus_area_1 = mus_1(:,4);
+mus_perimeter_1 = mus_1(:,5);
+mus_longax_1 = mus_1(:,6);
+mus_shortax_1 = mus_1(:,7);
+mus_angle_1 = mus_1(:,8);
+mus_ar_fiji_1 = mus_1(:,9);
+mus_cir_1 = mus_1(:,10);
+mean_muslong_1 = mean(mus_longax_1);
+
+titan_area_1 = titan_1(:,4);
+titan_perimeter_1 = titan_1(:,5);
+titan_longax_1 = titan_1(:,6);
+titan_shortax_1 = titan_1(:,7);
+titan_angle_1 = titan_1(:,8);
+titan_ar_fiji_1 = titan_1(:,9);
+titan_cir_1 = titan_1(:,10);
+mean_titanlong_1 = mean(titan_longax_1);
+
+% 
+% % Area 2
+% epi_area_2 = epi_2(:,4);
+% epi_perimeter_2 = epi_2(:,5);
+% epi_longax_2 = epi_2(:,6);
+% epi_shortax_2 = epi_2(:,7);
+% epi_angle_2 = epi_2(:,8);
+% epi_ar_fiji_2 = epi_2(:,9);
+% epi_cir_2 = epi_2(:,10);
+% mean_epilong_2 = mean(epi_longax_2);
+% 
+% mus_area_2 = mus_2(:,4);
+% mus_perimeter_2 = mus_2(:,5);
+% mus_longax_2 = mus_2(:,6);
+% mus_shortax_2 = mus_2(:,7);
+% mus_angle_2 = mus_2(:,8);
+% mus_ar_fiji_2 = mus_2(:,9);
+% mus_cir_2 = mus_2(:,10);
+% mean_muslong_2 = mean(mus_longax_2);
+% 
+% titan_area_2 = titan_2(:,4);
+% titan_perimeter_2 = titan_2(:,5);
+% titan_longax_2 = titan_2(:,6);
+% titan_shortax_2 = titan_2(:,7);
+% titan_angle_2 = titan_2(:,8);
+% titan_ar_fiji_2 = titan_2(:,9);
+% titan_cir_2 = titan_2(:,10);
+% mean_titanlong_2 = mean(titan_longax_2);
+% 
+% %Area 3
+% 
+% epi_area_3 = epi_3(:,4);
+% epi_perimeter_3 = epi_3(:,5);
+% epi_longax_3 = epi_3(:,6);
+% epi_shortax_3 = epi_3(:,7);
+% epi_angle_3 = epi_3(:,8);
+% epi_ar_fiji_3 = epi_3(:,9);
+% epi_cir_3 = epi_3(:,10);
+% mean_epilong_3 = mean(epi_longax_3);
+% 
+% mus_area_3 = mus_3(:,4);
+% mus_perimeter_3 = mus_3(:,5);
+% mus_longax_3 = mus_3(:,6);
+% mus_shortax_3 = mus_3(:,7);
+% mus_angle_3 = mus_3(:,8);
+% mus_ar_fiji_3 = mus_3(:,9);
+% mus_cir_3 = mus_3(:,10);
+% mean_muslong_3 = mean(mus_longax_3);
+% 
+% titan_area_3 = titan_3(:,4);
+% titan_perimeter_3 = titan_3(:,5);
+% titan_longax_3 = titan_3(:,6);
+% titan_shortax_3 = titan_3(:,7);
+% titan_angle_3 = titan_3(:,8);
+% titan_ar_fiji_3 = titan_3(:,9);
+% titan_cir_3 = titan_3(:,10);
+% mean_titanlong_3 = mean(titan_longax_3);
+
+
+
+%% aspect calculate
+epi_ar_me = epi_longax_1./epi_shortax_1;
+mus_ar_me = mus_longax_1./mus_shortax_1;
+titan_ar_me = titan_longax_1./titan_shortax_1;
+
+
+
+%% angle transformation to geological way
+epi_angles = anglenew(epi_angle_1);
+mus_angles = anglenew(mus_angle_1);
+titan_angles = anglenew(titan_angle_1);
+
+
+%% Automatically Determine Number of Bins
+
+% Freedman-Diaconis Rule
+bin_width_epi = 2 * iqr(epi_longax_1) / length(epi_longax_1)^(1/3);
+bin_width_mus = 2 * iqr(mus_longax_1) / length(mus_longax_1)^(1/3);
+bin_width_titan = 2 * iqr(titan_longax_1) / length(titan_longax_1)^(1/3);
+
+% Compute the number of bins
+numbinar_epi = round((max(epi_longax_1) - min(epi_longax_1)) / bin_width_epi);
+numbinar_mus = round((max(mus_longax_1) - min(mus_longax_1)) / bin_width_mus);
+numbinar_titan = round((max(titan_longax_1) - min(titan_longax_1)) / bin_width_titan);
+
+% Ensure bin number is reasonable (fallback to Scott's or Sturges' if needed)
+if isnan(numbinar_epi) || numbinar_epi <= 1
+    numbinar_epi = round(3.5 * std(epi_longax_1) / length(epi_longax_1)^(1/3)); % Scott’s Rule
+    if numbinar_epi < 1
+        numbinar_epi = round(1 + log2(length(epi_longax_1))); % Sturges' Rule
+    end
+end
+
+if isnan(numbinar_mus) || numbinar_mus <= 1
+    numbinar_mus = round(3.5 * std(mus_longax_1) / length(mus_longax_1)^(1/3)); 
+    if numbinar_mus < 1
+        numbinar_mus = round(1 + log2(length(mus_longax_1)));
+    end
+end
+
+if isnan(numbinar_titan) || numbinar_titan <= 1
+    numbinar_titan = round(3.5 * std(titan_longax_1) / length(titan_longax_1)^(1/3));
+    if numbinar_titan < 1
+        numbinar_titan = round(1 + log2(length(titan_longax_1)));
+    end
+end
+
+% Ensure bins are within a reasonable range
+numbinar_epi = max(10, min(numbinar_epi, 100));  % Keep within 10-100 bins
+numbinar_mus = max(10, min(numbinar_mus, 100));
+numbinar_titan = max(10, min(numbinar_titan, 100));
+
+%% Histogram Calculation
+[counts_epi, edges_epi] = histcounts(epi_longax_1, numbinar_epi);
+[counts_mus, edges_mus] = histcounts(mus_longax_1, numbinar_mus);
+[counts_titan, edges_titan] = histcounts(titan_longax_1, numbinar_titan);
+
+%% Histogram Plotting
+figure(1);
+hold on;
+
+% Plot histograms with distinct colors
+subplot(2,1,1)% mus and epi
+
+histogram(epi_longax_1, numbinar_epi, 'EdgeColor', 'k', 'FaceColor', 'b');
+hold on
+histogram(mus_longax_1, numbinar_mus, 'EdgeColor', 'k', 'FaceColor', 'red');
+
+% Plot mean lines with correct labels
+xline(mean_epilong_1, '--', 'LineWidth', 1.5, 'Color', 'k', 'Label', 'Mean Epi');
+hold on;
+xline(mean_muslong_1, '--', 'LineWidth', 1.5, 'Color', 'r', 'Label', 'Mean mus');
+
+
+% Labels and title
+xlabel('Length for long axis');
+ylabel('Frequency');
+title('Grain size distribution for minerals');
+
+% Add legend
+legend('Epidote','Muscovite');
+grid on;
+hold off
+
+subplot(2,1,2)% mus and titan
+histogram(titan_longax_1, numbinar_titan, 'EdgeColor', 'k', 'FaceColor', 'b');
+hold on 
+histogram(mus_longax_1, numbinar_mus, 'EdgeColor', 'k', 'FaceColor', 'red');
+
+hold on 
+% Plot mean lines with correct labels
+xline(mean_muslong_1, '--', 'LineWidth', 1.5, 'Color', 'r', 'Label', 'Mean mus');
+hold on;
+xline(mean_titanlong_1, '--', 'LineWidth', 1.5, 'Color', 'k', 'Label', 'Mean titan');
+
+% Labels and title
+xlabel('Length for long axis');
+ylabel('Frequency');
+title('Grain size distribution for minerals');
+
+% Add legend
+legend('Titanite','Muscovite');
+grid on;
+hold off
+
+
+%% Automatically Determine Number of Bins
+% Freedman-Diaconis Rule
+bin_width_epi = 2 * iqr(epi_ar_fiji_1) / length(epi_ar_fiji_1)^(1/3);
+bin_width_mus = 2 * iqr(mus_ar_fiji_1) / length(mus_ar_fiji_1)^(1/3);
+bin_width_titan = 2 * iqr(titan_ar_fiji_1) / length(titan_ar_fiji_1)^(1/3);
+
+% Compute the number of bins
+numbinar_epi = round((max(epi_ar_fiji_1) - min(epi_ar_fiji_1)) / bin_width_epi);
+numbinar_mus = round((max(mus_ar_fiji_1) - min(mus_ar_fiji_1)) / bin_width_mus);
+numbinar_titan = round((max(titan_ar_fiji_1) - min(titan_ar_fiji_1)) / bin_width_titan);
+
+% Ensure bin number is reasonable (fallback to Scott's or Sturges' if needed)
+if isnan(numbinar_epi) || numbinar_epi <= 1
+    numbinar_epi = round(3.5 * std(epi_ar_fiji_1) / length(epi_ar_fiji_1)^(1/3)); % Scott’s Rule
+    if numbinar_epi < 1
+        numbinar_epi = round(1 + log2(length(epi_ar_fiji_1))); % Sturges' Rule
+    end
+end
+
+if isnan(numbinar_mus) || numbinar_mus <= 1
+    numbinar_mus = round(3.5 * std(mus_ar_fiji_1) / length(mus_ar_fiji_1)^(1/3)); 
+    if numbinar_mus < 1
+        numbinar_mus = round(1 + log2(length(mus_ar_fiji_1)));
+    end
+end
+
+if isnan(numbinar_titan) || numbinar_titan <= 1
+    numbinar_titan = round(3.5 * std(titan_ar_fiji_1) / length(titan_ar_fiji_1)^(1/3));
+    if numbinar_titan < 1
+        numbinar_titan = round(1 + log2(length(titan_ar_fiji_1)));
+    end
+end
+
+% Ensure bins are within a reasonable range
+numbinar_epi = max(10, min(numbinar_epi, 100));  % Keep within 10-100 bins
+numbinar_mus = max(10, min(numbinar_mus, 100));
+numbinar_titan = max(10, min(numbinar_titan, 100));
+
+[counts_epi, edges_epi] = histcounts(epi_ar_fiji_1, numbinar_epi);
+[counts_mus, edges_mus] = histcounts(mus_ar_fiji_1, numbinar_mus);
+[counts_titan, edges_titan] = histcounts(titan_ar_fiji_1, numbinar_titan);
+
+
+figure(2)
+
+subplot(2,1,1)
+
+histogram(mus_ar_fiji_1, numbinar_mus, 'EdgeColor', 'k', 'FaceColor', 'r');
+hold on
+histogram(epi_ar_fiji_1, numbinar_epi, 'EdgeColor', 'k', 'FaceColor', 'b');
+
+% Plot mean lines with correct labels
+xline(mean(epi_ar_fiji_1), '--', 'LineWidth', 1.5, 'Color', 'k', 'Label', 'Mean Epi');
+hold on;
+xline(mean(mus_ar_fiji_1), '--', 'LineWidth', 1.5, 'Color', 'r', 'Label', 'Mean mus');
+hold on;
+
+xlim([0 12]);
+ylim([0 130]);
+xlabel('Aspect Ratio Distribution');
+ylabel('Frequency');
+legend('Muscovite','Epidote');
+title('Aspect ratio from best fit Ellipse');
+grid on;
+hold off;
+
+
+subplot(2,1,2)
+histogram(mus_ar_fiji_1, numbinar_mus, 'EdgeColor', 'k', 'FaceColor', 'r');
+hold on
+histogram(titan_ar_fiji_1, numbinar_titan, 'EdgeColor', 'k', 'FaceColor', 'b');
+% Plot mean lines with correct labels
+xline(mean(mus_ar_fiji_1), '--', 'LineWidth', 1.5, 'Color', 'r', 'Label', 'Mean mus');
+hold on;
+xline(mean(titan_ar_fiji_1), '--', 'LineWidth', 1.5, 'Color', 'k', 'Label', 'Mean titan');
+hold on 
+
+xlim([0 12]);
+ylim([0 130]);
+xlabel('Aspect Ratio Distribution');
+ylabel('Frequency');
+legend('Muscovite','Titanite');
+title('Aspect ratio from best fit Ellipse');
+grid on;
+hold off;
+
+
+
+%% for Figure 3
+
+% Freedman-Diaconis Rule
+bin_width_epi = 2 * iqr(epi_ar_me) / length(epi_ar_me)^(1/3);
+bin_width_mus = 2 * iqr(mus_ar_me) / length(mus_ar_me)^(1/3);
+bin_width_titan = 2 * iqr(titan_ar_me) / length(titan_ar_me)^(1/3);
+
+% Compute the number of bins
+numbinar_epi = round((max(epi_ar_me) - min(epi_ar_me)) / bin_width_epi);
+numbinar_mus = round((max(mus_ar_me) - min(mus_ar_me)) / bin_width_mus);
+numbinar_titan = round((max(titan_ar_me) - min(titan_ar_me)) / bin_width_titan);
+
+% Ensure bin number is reasonable (fallback to Scott's or Sturges' if needed)
+if isnan(numbinar_epi) || numbinar_epi <= 1
+    numbinar_epi = round(3.5 * std(epi_ar_me) / length(epi_ar_me)^(1/3)); % Scott’s Rule
+    if numbinar_epi < 1
+        numbinar_epi = round(1 + log2(length(epi_ar_me))); % Sturges' Rule
+    end
+end
+
+if isnan(numbinar_mus) || numbinar_mus <= 1
+    numbinar_mus = round(3.5 * std(mus_ar_me) / length(mus_ar_me)^(1/3)); 
+    if numbinar_mus < 1
+        numbinar_mus = round(1 + log2(length(mus_ar_me)));
+    end
+end
+
+if isnan(numbinar_titan) || numbinar_titan <= 1
+    numbinar_titan = round(3.5 * std(titan_ar_me) / length(titan_ar_me)^(1/3));
+    if numbinar_titan < 1
+        numbinar_titan = round(1 + log2(length(titan_ar_me)));
+    end
+end
+
+% Ensure bins are within a reasonable range
+numbinar_epi = max(10, min(numbinar_epi, 100));  % Keep within 10-100 bins
+numbinar_mus = max(10, min(numbinar_mus, 100));
+numbinar_titan = max(10, min(numbinar_titan, 100));
+
+[counts_epi, edges_epi] = histcounts(epi_ar_fiji_1, numbinar_epi);
+[counts_mus, edges_mus] = histcounts(mus_ar_fiji_1, numbinar_mus);
+[counts_titan, edges_titan] = histcounts(titan_ar_fiji_1, numbinar_titan);
+
+
+
+figure(3)
+
+subplot(2,1,1)
+
+histogram(mus_ar_me, numbinar_mus, 'EdgeColor', 'k', 'FaceColor', 'r');
+hold on
+histogram(epi_ar_me, numbinar_epi, 'EdgeColor', 'k', 'FaceColor', 'b');
+hold on
+
+% Plot mean lines with correct labels
+xline(mean(epi_ar_me), '--', 'LineWidth', 1.5, 'Color', 'k', 'Label', 'Mean Epi');
+hold on;
+xline(mean(mus_ar_me), '--', 'LineWidth', 1.5, 'Color', 'r', 'Label', 'Mean mus');
+hold on;
+
+xlim([0 12]);
+ylim([0 130]);
+xlabel('Aspect Ratio Distribution');
+ylabel('Frequency');
+legend('Muscovite','Epidote');
+title('Aspect ratio from natural shape');
+grid on;
+hold off;
+
+
+subplot(2,1,2)
+
+histogram(mus_ar_me, numbinar_mus, 'EdgeColor', 'k', 'FaceColor', 'r');
+hold on
+histogram(titan_ar_me, numbinar_titan, 'EdgeColor', 'k', 'FaceColor', 'b');
+hold on 
+
+% Plot mean lines with correct labels
+xline(mean(mus_ar_me), '--', 'LineWidth', 1.5, 'Color', 'r', 'Label', 'Mean mus');
+hold on;
+xline(mean(titan_ar_me), '--', 'LineWidth', 1.5, 'Color', 'b', 'Label', 'Mean titan');
+hold on 
+
+xlim([0 12]);
+ylim([0 130]);
+xlabel('Aspect Ratio Distribution');
+ylabel('Frequency');
+legend('Muscovite','Titanite');
+title('Aspect ratio from natural shape');
+grid on;
+hold off;
+
+
+%% Preferred Orientation - Rose Diagram (Rotated)
+
+angles_epi = anglenew(epi_angle_1);
+angles_mus = anglenew(mus_angle_1);
+angles_titan = anglenew(titan_angle_1);
+
+% Create a rose diagram with 16 bins (22.5° per bin, corresponding to pi/8 radians)
+angles_rad_epi = deg2rad(angles_epi);
+angles_rad_mus = deg2rad(angles_mus);
+angles_rad_titan = deg2rad(angles_titan);
+
+
+% Expand the angles to cover the full direction (add 180° to each angle)
+expanded_angles_rad_epi = [angles_rad_epi; angles_rad_epi + pi];
+expanded_angles_rad_mus = [angles_rad_mus; angles_rad_mus + pi];
+expanded_angles_rad_titan = [angles_rad_titan; angles_rad_titan + pi];
+
+
+
+
+% Create a rose diagram with 16 bins (22.5° per bin)
+binsz = 30;  % Uniform bin size (30° for all)
+bin_edges = 0:pi/binsz:2*pi;  % Create common bin edges
+
+
+figure(4)
+subplot(2,1,1)
+
+polarhistogram(expanded_angles_rad_mus, 'BinEdges', 0:pi/binsz:2*pi, ...
+    'Normalization', 'count', 'EdgeColor', 'black', 'FaceColor', 'r');
+hold on 
+polarhistogram(expanded_angles_rad_epi, 'BinEdges', 0:pi/binsz:2*pi, ...
+    'Normalization', 'count', 'EdgeColor', 'black', 'FaceColor', 'k');
+
+hold on;
+
+% Get current axes and set properties
+ax = gca;
+ax.ThetaDir = 'clockwise';  % Angles increase counterclockwise
+ax.ThetaZeroLocation = 'top';      % 0° at the top
+ax.RTickLabel = [];               % Remove radial labels
+
+legend("Muscovite","Epidote");
+
+subplot(2,1,2)
+
+polarhistogram(expanded_angles_rad_mus, 'BinEdges', 0:pi/binsz:2*pi, ...
+    'Normalization', 'count', 'EdgeColor', 'black', 'FaceColor', 'r');
+hold on 
+polarhistogram(expanded_angles_rad_titan, 'BinEdges', 0:pi/binsz:2*pi, ...
+    'Normalization', 'count', 'EdgeColor', 'black', 'FaceColor', 'k');
+
+hold on;
+
+% Get current axes and set properties
+ax = gca;
+ax.ThetaDir = 'clockwise';  % Angles increase counterclockwise
+ax.ThetaZeroLocation = 'top';      % 0° at the top
+ax.RTickLabel = [];               % Remove radial labels
+
+legend("Muscovite","Titanite");
+
