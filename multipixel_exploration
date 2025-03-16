@@ -1,0 +1,62 @@
+# Detect the nearby pixles between the multiple images in the same positions. If there are, then the pixels of the region from these
+images will be kept, or deleted. 
+
+close all; clear all; clc;
+I1 = imread('mus.tif'); % 读取第一张二值图像
+I2 = imread('titan.tif'); % 读取第二张二值图像
+% 确保图像是二值的
+I1 = im2bw(I1);
+I2 = im2bw(I2);
+
+se = strel('square', 90); % 定义膨胀核（3x3邻域）- the number here can be changed based on the detection aim.
+
+I1_dilated = imdilate(I1, se);% 对两张图像进行膨胀
+I2_dilated = imdilate(I2, se);
+mask = I1_dilated & I2_dilated;% 找到相同位置和邻近区域都有像素的地方
+
+CC1 = bwconncomp(I1); % 找到 I1 和 I2 中所有的连通区域
+CC2 = bwconncomp(I2);
+I1_result = false(size(I1));% 创建新的结果图像，初始化为全零
+I2_result = false(size(I2));
+
+for i = 1:CC1.NumObjects% 遍历 I1 中的连通区域，保留和 mask 有重叠的区域
+    regionPixels = CC1.PixelIdxList{i}; % 获取当前连通区域的像素索引
+    if any(mask(regionPixels)) % 如果该区域与 mask 有重叠，则保留
+        I1_result(regionPixels) = true;
+    end
+end
+
+for i = 1:CC2.NumObjects% 遍历 I2 中的连通区域，保留和 mask 有重叠的区域
+    regionPixels = CC2.PixelIdxList{i}; % 获取当前连通区域的像素索引
+    if any(mask(regionPixels)) % 如果该区域与 mask 有重叠，则保留
+        I2_result(regionPixels) = true;
+    end
+end
+
+figure(1);% 显示结果
+subplot(1,2,1), imshow(I1), title('原始图1');
+subplot(1,2,2), imshow(I2), title('原始图2');
+figure(2)
+imshow(I1_result), title('处理后图1');
+imwrite(I1_result, 'mus_process.tif');
+figure(3)
+imshow(I2_result), title('处理后图2');
+imwrite(I2_result, 'titan_process.tif');
+
+% Convert binary images to uint8 (0 or 255)
+I1_result = uint8(I1_result) * 255;
+I2_result = uint8(I2_result) * 255;
+
+% Create RGB channels
+R = I1_result;   % Red channel for I1
+G = zeros(size(I1_result));  % Green channel remains 0
+B = I2_result;   % Blue channel for I2
+
+% Combine into an RGB image
+RGB_combined = cat(3, R, G, B);
+
+% Display the colored combined image
+figure(4);
+imshow(RGB_combined);
+title('Two Images Combined with Different Colors');
+imwrite(RGB_combined, 'mus and titan.tif');
