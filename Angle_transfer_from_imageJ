@@ -1,0 +1,18 @@
+# The fucntion serve for the following orientation analysis for the orientation data obtained from ImageJ（Feretangle）
+# m are the data from imageJ
+
+function [angles] = anglenew(m)
+    % Initialize an array to store the calculated angles
+    angles = zeros(size(m));  % To store the calculated angles
+    
+    % Loop through each element in the input array m
+    for i = 1:length(m)
+        if m(i) <= 90
+            angles(i) = 90 - m(i);  % Calculate 90 - variable if less than or equal to 90
+        elseif m(i) > 90 && m(i) <= 180
+            angles(i) = 450 - m(i); % Calculate 450 - variable if between 90 and 180
+        else
+            angles(i) = NaN;  % Optional: Handle values outside of 0-180 range
+        end
+    end
+end
