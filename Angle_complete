@@ -1,0 +1,15 @@
+# Fill another half when doing the rose diagram plot
+
+function [anglenewb] = anotherhalf(m)
+
+    anglenewb = zeros(size(m));  % To store the calculated angles
+    
+    % Loop through each element in the input array m
+    for i = 1:length(m)
+        if m(i) <= 180 &&  m(i) >= 0
+            anglenewb(i) = m(i) + 180;  % Calculate 90 - variable if less than or equal to 90
+        elseif m(i) > 180 && m(i) < 360
+            anglenewb(i) =  m(i)-180; % Calculate 450 - variable if between 90 and 180
+        end
+    end        
+end
