@@ -1,0 +1,63 @@
+# Setup the bin for histmap
+
+close all; clc;
+
+% Read Data
+epi_1 = readmatrix("Epi_stithed_1.xlsx");
+mus_1 = readmatrix("mus_stithed_1.xlsx");
+titan_1 = readmatrix("titan_stithed_1.xlsx");
+
+% Extract key parameters
+epi_longax_1 = epi_1(:,6);
+mus_longax_1 = mus_1(:,6);
+titan_longax_1 = titan_1(:,6);
+
+% Compute mean long axis lengths
+mean_epilong_1 = mean(epi_longax_1);
+mean_muslong_1 = mean(mus_longax_1);
+mean_titanlong_1 = mean(titan_longax_1);
+
+%% **Determine Common Bin Edges for Equal Bar Widths**
+global_min = min([min(epi_longax_1), min(mus_longax_1), min(titan_longax_1)]);
+global_max = max([max(epi_longax_1), max(mus_longax_1), max(titan_longax_1)]);
+
+% **Use Freedman-Diaconis Rule for optimal bin width**
+bin_width = 2 * iqr([epi_longax_1; mus_longax_1; titan_longax_1]) / length([epi_longax_1; mus_longax_1; titan_longax_1])^(1/3);
+numbins = round((global_max - global_min) / bin_width);
+
+% **Ensure bins are reasonable (fallback to Sturges' Rule)**
+if isnan(numbins) || numbins < 10
+    numbins = round(1 + log2(length([epi_longax_1; mus_longax_1; titan_longax_1])));
+end
+
+% Define common bin edges
+common_edges = linspace(global_min, global_max, numbins + 1);
+
+%% **Histogram Calculation Using Common Bins**
+[counts_epi, ~] = histcounts(epi_longax_1, common_edges);
+[counts_mus, ~] = histcounts(mus_longax_1, common_edges);
+[counts_titan, ~] = histcounts(titan_longax_1, common_edges);
+
+%% **Plot Histograms with Same Bin Width**
+figure(1);
+hold on;
+
+% Convert histogram data to bar plots for uniformity
+bar(common_edges(1:end-1), counts_titan, 'FaceColor', 'k', 'EdgeColor', 'k', 'BarWidth', 1, 'DisplayName', 'Titanite');
+bar(common_edges(1:end-1), counts_epi, 'FaceColor', 'b', 'EdgeColor', 'k', 'BarWidth', 0.7, 'DisplayName', 'Epidote');
+bar(common_edges(1:end-1), counts_mus, 'FaceColor', 'r', 'EdgeColor', 'k', 'BarWidth', 0.5, 'DisplayName', 'Muscovite');
+
+% **Add Mean Lines**
+xline(mean_epilong_1, '--', 'LineWidth', 1.5, 'Color', 'b', 'Label', 'Epidote Mean');
+xline(mean_muslong_1, '--', 'LineWidth', 1.5, 'Color', 'r', 'Label', 'Muscovite Mean');
+xline(mean_titanlong_1, '--', 'LineWidth', 1.5, 'Color', 'k', 'Label', 'Titanite Mean');
+
+% **Customize Labels and Title**
+xlabel('Length for Long Axis');
+ylabel('Frequency');
+title('Grain Size Distribution for Minerals');
+
+% **Legend and Grid**
+legend('show');
+grid on;
+hold off;
